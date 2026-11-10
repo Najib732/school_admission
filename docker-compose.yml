@@ -1,0 +1,38 @@
+# docker compose up --build   -> database + backend (http://localhost:8080)
+#
+# Environment variables (optional):
+#   DB_CONNECTION  database connection string for the backend (default: the db service below)
+
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: school_admission
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d school_admission"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  backend:
+    build:
+      context: ./backend
+      target: final
+    environment:
+      ConnectionStrings__DefaultConnection: "${DB_CONNECTION:-Host=db;Port=5432;Database=school_admission;Username=postgres;Password=postgres}"
+      PORT: "8080"
+      HOLD_DURATION_SECONDS: "600"
+      HOLD_EXPIRY_INTERVAL_SECONDS: "5"
+      Cors__AllowedOrigins__0: "http://localhost:3000"
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pgdata:
