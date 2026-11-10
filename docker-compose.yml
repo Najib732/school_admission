@@ -34,5 +34,17 @@ services:
       db:
         condition: service_healthy
 
+  # Tests (docker compose --profile test run --rm backend-tests)
+  backend-tests:
+    profiles: ["test"]
+    build:
+      context: ./backend
+      target: test
+    environment:
+      TEST_DB_CONNECTION: "Host=db;Port=5432;Username=postgres;Password=postgres"
+    depends_on:
+      db:
+        condition: service_healthy
+
 volumes:
   pgdata:
