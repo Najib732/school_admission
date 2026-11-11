@@ -12,10 +12,6 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN npm run build
 
-# Tests (docker compose --profile test run --rm frontend-tests)
-FROM build AS test
-CMD ["npm", "test"]
-
 # Run: the backend address (API_URL) comes from docker-compose.yml when the container starts.
 FROM node:22-alpine AS final
 WORKDIR /app

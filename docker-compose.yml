@@ -64,7 +64,7 @@ services:
       db:
         condition: service_healthy
 
-  # Tests (docker compose --profile test run --rm backend-tests / frontend-tests)
+  # Tests (docker compose --profile test run --rm backend-tests)
   backend-tests:
     profiles: ["test"]
     build:
@@ -75,12 +75,6 @@ services:
     depends_on:
       db:
         condition: service_healthy
-
-  frontend-tests:
-    profiles: ["test"]
-    build:
-      context: ./frontend
-      target: test
 
 volumes:
   pgdata:
