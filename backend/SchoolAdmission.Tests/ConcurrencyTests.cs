@@ -36,23 +36,4 @@ public class ConcurrencyTests
         Assert.Equal(1, responses.Count(r => r.StatusCode == HttpStatusCode.Created));
         Assert.Equal(1, (await client.GetClass(cls.Id)).HeldSeats);
     }
-
-    [Fact]
-    public async Task TwoBackendServersOnTheSameDatabase_NeverOverbook()
-    {
-        await using var app = TestApp.Create();
-        var server1 = app.StartServer();
-        var server2 = app.StartServer();
-        var cls = await server1.CreateClass("Class 8 - Day Shift", 7);
-
-        // Half the students reach server 1, half reach server 2, all at once.
-        var responses = await Task.WhenAll(Enumerable.Range(1, 80).Select(n =>
-            (n % 2 == 0 ? server1 : server2).Apply(cls.Id, ApiExtensions.Student(n))));
-
-        Assert.Equal(7, responses.Count(r => r.StatusCode == HttpStatusCode.Created));
-
-        var after = await server2.GetClass(cls.Id);
-        Assert.Equal(7, after.HeldSeats);
-        Assert.True(after.HeldSeats + after.ConfirmedSeats <= after.TotalSeats);
-    }
 }

@@ -46,24 +46,6 @@ services:
     depends_on:
       - backend
 
-  # Bonus: a second backend process on the same database (docker compose --profile two-backends up --build)
-  backend-2:
-    profiles: ["two-backends"]
-    build:
-      context: ./backend
-      target: final
-    environment:
-      ConnectionStrings__DefaultConnection: "${DB_CONNECTION:-Host=db;Port=5432;Database=school_admission;Username=postgres;Password=postgres}"
-      PORT: "8080"
-      HOLD_DURATION_SECONDS: "600"
-      HOLD_EXPIRY_INTERVAL_SECONDS: "5"
-      Cors__AllowedOrigins__0: "http://localhost:3000"
-    ports:
-      - "8081:8080"
-    depends_on:
-      db:
-        condition: service_healthy
-
   # Tests (docker compose --profile test run --rm backend-tests)
   backend-tests:
     profiles: ["test"]

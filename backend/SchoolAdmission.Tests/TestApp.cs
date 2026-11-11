@@ -36,7 +36,6 @@ public sealed class TestApp : IAsyncDisposable
         return new TestApp(builder.ConnectionString);
     }
 
-    // One backend "process". Call twice to get two servers sharing the same database.
     public HttpClient StartServer(int holdDurationSeconds = 600, int expiryIntervalSeconds = 60)
     {
         var factory = new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
